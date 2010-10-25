@@ -28,20 +28,61 @@ Only one mesh can be exported at a time.
 
 import bpy, os
 
-def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, use_colors=True):
+def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True):
     
     scene = context.scene
     obj = context.object
-    meshname = obj.data.name
-
+    
     if not obj:
         raise Exception("Error, Select 1 active object")
 
-    file = open(filepath, 'w')
-
     if scene.objects.active:
         bpy.ops.object.mode_set(mode='OBJECT')
+        
+    file = open(filepath, 'w')
+    file.write('<?xml version="1.0"?>\n')
+    file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
+    file.write('<glge>\n')
+    writeMesh(file, scene, obj,use_modifiers, use_normals, use_uv_coords)
+    writeScene(file, scene)
+    file.write('\n</glge>\n')
+    file.close()
+        
+    print("writing %r done" % filepath)
+    
+    return {'FINISHED'}
 
+def writeScene(file, scene):
+    file.write('\t<scene id="%s" camera="#%s" ambient_color="#666" fog_type="FOG_NONE">' % (scene.name, scene.camera.name))
+
+    for sceneObject in scene.objects:
+        if sceneObject.type == "MESH":
+            file.write('\n\t\t<object id="%s" mesh="#%s"' % (sceneObject.name, sceneObject.data.name))
+            file.write(' scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(sceneObject.scale))
+            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
+            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
+            file.write(' material="#%s"' % sceneObject.material_slots.items()[0][0])
+            file.write(' />')
+            
+        if sceneObject.type == "LAMP":
+            file.write('\n\t\t<light id="%s"' % sceneObject.name)
+            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
+            file.write(' attenuation_constant="0.5" type="L_POINT"')
+            file.write(' />')
+        
+        if sceneObject.type == "CAMERA":
+            file.write('\n\t\t<camera id="%s"' % sceneObject.name)
+            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
+            file.write(' rot_order="ROT_XZY" xtype="C_PERSPECTIVE"')
+            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
+            file.write(' />')
+
+    file.write('\n\t</scene>')    
+
+    
+def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
+    meshname = obj.data.name
+    
     if use_modifiers:
         mesh = obj.create_mesh(scene, True, 'PREVIEW')
     else:
@@ -69,9 +110,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
         else:
             active_uv_layer = active_uv_layer.data
 
-    file.write('<?xml version="1.0"?>\n')
-    file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
-    file.write('<glge>\n')
+
     file.write("\t<mesh id=\"%s\">\n"  % (meshname))
     
     vertices = "\t\t<positions>"
@@ -124,13 +163,10 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write(indices + "\n\t\t</faces>\n")
 
     file.write('\t</mesh>\n')
-    file.write('</glge>\n')
-    
-    file.close()
-    print("writing %r done" % filepath)
 
+    
     if use_modifiers:
         bpy.data.meshes.remove(mesh)
+        
+    print("writing of Mesh %r done" % meshname)
 
-    
-    return {'FINISHED'}
