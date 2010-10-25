@@ -87,10 +87,16 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     index = 0
     
     for i,f in enumerate(mesh.faces):
+        lastFace = (i == len(mesh.faces)-1)
         for j,vertex in enumerate(f.vertices):
-            vertices+= '\n\t\t\t%f,%f,%f,' % tuple(mesh.vertices[vertex].co)
+            lastVert = (j == len(f.vertices)-1 and lastFace)
+            vertices+= '\n\t\t\t%f,%f,%f' % tuple(mesh.vertices[vertex].co)
+            if not lastVert:
+                vertices+="," 
             if use_normals:
-                normals += '\n\t\t\t%f,%f,%f,' % tuple(f.normal) # no
+                normals += '\n\t\t\t%f,%f,%f' % tuple(f.normal) # no
+                if not lastVert:
+                    normals+="," 
         if use_uv_coords:
             uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv1)
             uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv2)
@@ -98,12 +104,16 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
             
             #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv1)
             #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv3)
-            uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv4)
+            uvs += "\n\t\t\t%f,%f" % tuple(uv[i].uv4)
+            if not lastFace:
+                uvs += ","
             
             
-        indices += '%i,%i,%i,' % (index,index+1,index+2)
+        indices += '%i,%i,%i' % (index,index+1,index+2)
         if len(f.vertices) == 4:
-            indices += '%i,%i,%i,' % (index,index+2,index+3)
+            indices += ',%i,%i,%i' % (index,index+2,index+3)
+        if not lastFace:
+            indices += ","
         index+=len(f.vertices)
 
     file.write(vertices + "\n\t\t</positions>\n")
