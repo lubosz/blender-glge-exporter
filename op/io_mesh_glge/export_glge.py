@@ -18,7 +18,7 @@
 
 # <pep8 compliant>
 
-# Copyright (C) 2010: Lubosz Sarnecki, lubosz@gmail.com
+# Author: Lubosz Sarnecki, lsarnecki@uni-koblenz.de
 
 """
 This script exports GLGE XML files from Blender. It supports normals
@@ -64,7 +64,11 @@ def writeScene(file, scene):
             file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
             file.write(' scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(sceneObject.scale))
             file.write(' material="#%s"' % sceneObject.material_slots.items()[0][0])
+            if len(sceneObject.material_slots[0].material.texture_slots.items()) > 0:
+                if sceneObject.material_slots[0].material.texture_slots[0].use_map_alpha:
+                    file.write(' ztransparent="TRUE"')
             file.write(' />')
+            #skeleton="#Armature" action="#Stand"
             
         if sceneObject.type == "LAMP":
             file.write('\n\t\t<light id="%s"' % sceneObject.name)
@@ -102,19 +106,21 @@ def writeMaterials(file):
                       material.emit
                       )
                    )
-        for textureFoo in material.texture_slots.items():
-            
-            texture = textureFoo[1].texture
+        for texture_slot in material.texture_slots.items():
+           
+            texture = texture_slot[1].texture
             if texture.type == "IMAGE":
                 
                 if texture.use_normal_map:
                     target = 'M_NOR'
                 else:
                     target = 'M_COLOR'
-                    #M_ALPHA, M_HEIGHT M_MSKA M_SPECCOLOR
+                    #M_HEIGHT M_MSKA M_SPECCOLOR
             
-                file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name, texture.image.filepath))
+                file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name, texture.image.filepath.replace("//","")))
                 file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1',target))
+                if texture_slot[1].use_map_alpha:
+                    file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1','M_ALPHA'))
                 #scale_y="10" alpha="0.5" blend_mode="BL_MUL"
                 #mapinput MAP_ENV, MAP_OBJ, UV2
         file.write('\n\t</material>')
