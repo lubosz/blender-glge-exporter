@@ -60,22 +60,28 @@ def writeScene(file, scene):
     for sceneObject in scene.objects:
         if sceneObject.type == "MESH":
             file.write('\n\t\t<object id="%s" mesh="#%s"' % (sceneObject.name, sceneObject.data.name))
-            file.write(' scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(sceneObject.scale))
-            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
             file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
+            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
+            file.write(' scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(sceneObject.scale))
             file.write(' material="#%s"' % sceneObject.material_slots.items()[0][0])
             file.write(' />')
             
         if sceneObject.type == "LAMP":
             file.write('\n\t\t<light id="%s"' % sceneObject.name)
             file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
-            file.write(' attenuation_constant="0.5" type="L_POINT"')
+            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
+            file.write(' attenuation_constant="0.5" attenuation_linear="0.00000001" attenuation_quadratic="0.00001" type="L_POINT"')
             file.write(' />')
+            #color_r="0.8" color_b="0.8" color_g="0.8" type="L_DIR"
+            #Spot:
+            #buffer_height="512" buffer_width="512" shadow_bias="5.0" spot_cos_cut_off="0.775" 
+            #cast_shadows="TRUE" spot_exponent="50"  
+            # color="#888" attenuation_constant="1.0" type="L_SPOT"
         
         if sceneObject.type == "CAMERA":
             file.write('\n\t\t<camera id="%s"' % sceneObject.name)
             file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(sceneObject.location))
-            file.write(' rot_order="ROT_XZY" xtype="C_PERSPECTIVE"')
+            file.write(' rot_order="ROT_XZY" xtype="C_PERSPECTIVE"') #C_ORTHO
             file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(sceneObject.rotation_euler))
             file.write(' />')
 
@@ -85,7 +91,8 @@ def writeMaterials(file):
     
     for material in bpy.data.materials:
         
-        file.write('\n\t<material id="%s" color="#%s" specular="%f" reflectivity="%f" shininess="%f" emit="%f">' 
+        file.write('\n\t<material id="%s" color="#%s" specular="%f" reflectivity="%f" shininess="%f" emit="%f">'
+                   #shadow = "FALSE" alpha="0.3"
                    % (
                       material.name,
                       hexColor(material.diffuse_color),
@@ -104,9 +111,12 @@ def writeMaterials(file):
                     target = 'M_NOR'
                 else:
                     target = 'M_COLOR'
+                    #M_ALPHA, M_HEIGHT M_MSKA M_SPECCOLOR
             
                 file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name, texture.image.filepath))
                 file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1',target))
+                #scale_y="10" alpha="0.5" blend_mode="BL_MUL"
+                #mapinput MAP_ENV, MAP_OBJ, UV2
         file.write('\n\t</material>')
     
 def writeMeshes(file):
