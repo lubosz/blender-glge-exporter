@@ -43,7 +43,9 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write('<?xml version="1.0"?>\n')
     file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
     file.write('<glge>\n')
-    writeMesh(file, scene, obj,use_modifiers, use_normals, use_uv_coords)
+    #writeMesh(file, scene, obj,use_modifiers, use_normals, use_uv_coords)
+    writeMeshes(file)
+    writeMaterials(file)
     writeScene(file, scene)
     file.write('\n</glge>\n')
     file.close()
@@ -53,7 +55,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     return {'FINISHED'}
 
 def writeScene(file, scene):
-    file.write('\t<scene id="%s" camera="#%s" ambient_color="#666" fog_type="FOG_NONE">' % (scene.name, scene.camera.name))
+    file.write('\n\t<scene id="%s" camera="#%s" ambient_color="#666" fog_type="FOG_NONE">' % (scene.name,scene.camera.name))
 
     for sceneObject in scene.objects:
         if sceneObject.type == "MESH":
@@ -79,15 +81,57 @@ def writeScene(file, scene):
 
     file.write('\n\t</scene>')    
 
+def writeMaterials(file):
     
-def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
-    meshname = obj.data.name
+    for material in bpy.data.materials:
+        
+        file.write('\n\t<material id="%s" color="#%s" specular="%f" reflectivity="%f" shininess="%f" emit="%f">' 
+                   % (
+                      material.name,
+                      hexColor(material.diffuse_color),
+                      material.specular_intensity,
+                      material.raytrace_mirror.reflect_factor,
+                      material.specular_hardness,
+                      material.emit
+                      )
+                   )
+        for textureFoo in material.texture_slots.items():
+            
+            texture = textureFoo[1].texture
+            if texture.type == "IMAGE":
+                
+                if texture.use_normal_map:
+                    target = 'M_NOR'
+                else:
+                    target = 'M_COLOR'
+            
+                file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name, texture.image.filepath))
+                file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1',target))
+        file.write('\n\t</material>')
     
+def writeMeshes(file):
+    
+    for mesh in bpy.data.meshes:
+        writeMesh(file, mesh)
+
+def hexColor(color):
+    hexColor = ""
+    hexColor += "%x" % int(color.r * 255)
+    hexColor += "%x" % int(color.g * 255)
+    hexColor += "%x" % int(color.b * 255)
+    return hexColor
+    
+#def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
+def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
+    #meshname = obj.data.name
+    
+    """
     if use_modifiers:
         mesh = obj.create_mesh(scene, True, 'PREVIEW')
     else:
         mesh = obj.data
-
+    """
+    
     if not mesh:
         raise Exception("Error, could not get mesh data from active object")
 
@@ -111,7 +155,7 @@ def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
             active_uv_layer = active_uv_layer.data
 
 
-    file.write("\t<mesh id=\"%s\">\n"  % (meshname))
+    file.write("\t<mesh id=\"%s\">\n"  % (mesh.name))
     
     vertices = "\t\t<positions>"
     
@@ -164,9 +208,10 @@ def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
 
     file.write('\t</mesh>\n')
 
-    
+    """
     if use_modifiers:
         bpy.data.meshes.remove(mesh)
+    """
         
-    print("writing of Mesh %r done" % meshname)
+    print("writing of Mesh %r done" % mesh.name)
 
