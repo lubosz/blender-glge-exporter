@@ -27,8 +27,8 @@ from bpy.props import *
 from io_utils import ExportHelper
 
 
-class ExportPLY(bpy.types.Operator, ExportHelper):
-    '''Export a single object as a GLGE XML with normals and texture coordinates.'''
+class ExportGLGE(bpy.types.Operator, ExportHelper):
+    '''Export a GLGE Scene as XML with meshes, lights, camera, materials and objects.'''
     bl_idname = "export.xml"
     bl_label = "Export GLGE"
     
@@ -59,7 +59,7 @@ class ExportPLY(bpy.types.Operator, ExportHelper):
 
 
 def menu_func(self, context):
-    self.layout.operator(ExportPLY.bl_idname, text="GLGE (.xml)")
+    self.layout.operator(ExportGLGE.bl_idname, text="GLGE (.xml)")
 
 
 def register():

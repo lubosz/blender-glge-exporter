@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8 compliant>
-
+# coding: utf-8
 # Author: Lubosz Sarnecki, lsarnecki@uni-koblenz.de
 
 """
