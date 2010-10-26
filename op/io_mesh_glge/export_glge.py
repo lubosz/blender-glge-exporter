@@ -43,7 +43,6 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write('<?xml version="1.0"?>\n')
     file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
     file.write('<glge>\n')
-    #writeMesh(file, scene, obj,use_modifiers, use_normals, use_uv_coords)
     writeMeshes(file)
     writeMaterials(file)
     writeScene(file, scene)
@@ -95,15 +94,15 @@ def writeMaterials(file):
     
     for material in bpy.data.materials:
         
-        file.write('\n\t<material id="%s" color="#%s" specular="%f" reflectivity="%f" shininess="%f" emit="%f">'
+        file.write('\n\t<material id="%s" color="rgb(%f,%f,%f)" specular="%f" reflectivity="%f" shininess="%f" emit="%f">'
                    #shadow = "FALSE" alpha="0.3"
                    % (
                       material.name,
-                      hexColor(material.diffuse_color),
+                      material.diffuse_color.r * 255.0, material.diffuse_color.g * 255.0, material.diffuse_color.b * 255.0,
                       material.specular_intensity,
                       material.raytrace_mirror.reflect_factor,
                       material.specular_hardness,
-                      material.emit
+                      material.emit+.1
                       )
                    )
         for texture_slot in material.texture_slots.items():
@@ -117,10 +116,10 @@ def writeMaterials(file):
                     target = 'M_COLOR'
                     #M_HEIGHT M_MSKA M_SPECCOLOR
             
-                file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name, texture.image.filepath.replace("//","")))
-                file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1',target))
+                file.write('\n\t\t<texture id="%s" src="%s" />' % (texture.name+"Tex", texture.image.filepath.replace("//","")))
+                file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name+"Tex", 'UV1',target))
                 if texture_slot[1].use_map_alpha:
-                    file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name, 'UV1','M_ALPHA'))
+                    file.write('\n\t\t<material_layer texture="#%s" mapinput="%s" mapto="%s" />' % (texture.name+"Tex", 'UV1','M_ALPHA'))
                 #scale_y="10" alpha="0.5" blend_mode="BL_MUL"
                 #mapinput MAP_ENV, MAP_OBJ, UV2
         file.write('\n\t</material>')
@@ -136,6 +135,9 @@ def hexColor(color):
     hexColor += "%x" % int(color.g * 255)
     hexColor += "%x" % int(color.b * 255)
     return hexColor
+
+def rgbColor(color):
+    return 
     
 #def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
 def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
@@ -193,7 +195,10 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             if not lastVert:
                 vertices+="," 
             if use_normals:
-                normals += '\n\t\t\t%f,%f,%f' % tuple(f.normal) # no
+                if f.use_smooth:
+                    normals += '\n\t\t\t%f,%f,%f' % tuple(mesh.vertices[vertex].normal) # smooth?
+                else:
+                    normals += '\n\t\t\t%f,%f,%f' % tuple(f.normal) # no
                 if not lastVert:
                     normals+="," 
         if use_uv_coords:
