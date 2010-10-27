@@ -32,6 +32,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     
     scene = context.scene
     obj = context.object
+    meshFileName = "meshes.xml"
     
     """
     if not obj:
@@ -40,21 +41,32 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     if scene.objects.active:
         bpy.ops.object.mode_set(mode='OBJECT')
     """
-        
+    dest_dir = os.path.dirname(filepath)
+    meshpath = dest_dir + "/" + meshFileName
+    file = beginGLGEFile(meshpath)
+    writeMeshes(file)
+    endGLGEFile(file)
+    
+    file = beginGLGEFile(filepath)
+    file.write('\t<import url="%s" />' % meshFileName)
+    writeMaterials(file)
+    writeScene(file, scene)
+    endGLGEFile(file)
+    
+    return {'FINISHED'}
+
+def beginGLGEFile(filepath):
     file = open(filepath, 'w')
     file.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
     file.write('<!DOCTYPE glge SYSTEM "glge.dtd">\n')
     file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
     file.write('<glge>\n')
-    writeMeshes(file)
-    writeMaterials(file)
-    writeScene(file, scene)
+    return file
+
+def endGLGEFile(file):
     file.write('\n</glge>\n')
     file.close()
-        
-    print("writing %r done" % filepath)
-    
-    return {'FINISHED'}
+    print("writing %r done" % file.name)
 
 def writeScene(file, scene):
     if scene.world.mist_settings.use_mist:
@@ -63,6 +75,7 @@ def writeScene(file, scene):
         fog = 'FOG_NONE'
     
     file.write('\n\t<scene id="%s" camera="#%s" ambient_color="%s" fog_type="%s">' 
+               #background_color
                % (
                   scene.name,
                   scene.camera.name,
@@ -75,7 +88,7 @@ def writeScene(file, scene):
     elTab = "\n\t\t\t"
     for obj in scene.objects:
         if obj.type == "MESH":
-            file.write(tagTab+'<object id="%s" mesh="#%s"' % (obj.name, obj.data.name))
+            file.write(tagTab+'<object id="%s" mesh="#%s"' % (obj.name, obj.data.name+"Mesh"))
             file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
             file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
             file.write(elTab+'scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(obj.scale))
@@ -160,7 +173,6 @@ def writeMaterials(file):
         file.write('\n\t</material>')
     
 def writeMeshes(file):
-    
     for mesh in bpy.data.meshes:
         writeMesh(file, mesh)
 
@@ -209,7 +221,7 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             active_uv_layer = active_uv_layer.data
 
 
-    file.write("\t<mesh id=\"%s\">\n"  % (mesh.name))
+    file.write("\t<mesh id=\"%s\">\n"  % (mesh.name+"Mesh"))
     
     vertices = "\t\t<positions>"
     
