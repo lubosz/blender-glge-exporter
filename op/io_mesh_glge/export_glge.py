@@ -93,8 +93,8 @@ def writeScene(file, scene):
             file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
             file.write(elTab+'scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(obj.scale))
             file.write(elTab+'material="#%s"' % obj.material_slots.items()[0][0])
-            if len(obj.material_slots[0].material.texture_slots.items()) > 0:
-                if obj.material_slots[0].material.texture_slots[0].use_map_alpha:
+            material = obj.material_slots[0].material
+            if (len(material.texture_slots.items()) > 0 and material.texture_slots[0].use_map_alpha) or material.alpha != 1.0:
                     file.write(elTab+'ztransparent="TRUE"')
             file.write(tagTab+'/>')
             #skeleton="#Armature" action="#Stand"
@@ -149,7 +149,8 @@ def writeMaterials(file):
                       )
                    )
         #file.write(' reflectivity="%f"' % material.raytrace_mirror.reflect_factor)
-        #file.write(' alpha="%f"' % '1.0')
+        if material.alpha != 1 and material.alpha != 0:
+            file.write(' alpha="%f"' % material.alpha)
         #file.write(' shadow = "TRUE"')
         file.write(' >')
         
