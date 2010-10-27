@@ -28,29 +28,26 @@ Only one mesh can be exported at a time.
 
 import bpy, os
 
+modifiedMeshes = {}
+
 def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True):
     
     scene = context.scene
     obj = context.object
     meshFileName = "meshes.xml"
     
-    """
-    if not obj:
-        raise Exception("Error, Select 1 active object")
-
-    if scene.objects.active:
-        bpy.ops.object.mode_set(mode='OBJECT')
-    """
-    dest_dir = os.path.dirname(filepath)
-    meshpath = dest_dir + "/" + meshFileName
-    file = beginGLGEFile(meshpath)
-    writeMeshes(file)
-    endGLGEFile(file)
-    
+    #Write scene file
     file = beginGLGEFile(filepath)
     file.write('\t<import url="%s" />' % meshFileName)
     writeMaterials(file)
     writeScene(file, scene)
+    endGLGEFile(file)
+    
+    #write mesh file
+    dest_dir = os.path.dirname(filepath)
+    meshpath = dest_dir + "/" + meshFileName
+    file = beginGLGEFile(meshpath)
+    writeMeshes(file)
     endGLGEFile(file)
     
     return {'FINISHED'}
@@ -74,18 +71,19 @@ def writeScene(file, scene):
     else:
         fog = 'FOG_NONE'
     
-    file.write('\n\t<scene id="%s" camera="#%s" ambient_color="%s" fog_type="%s">' 
-               #background_color
+    file.write('\n\t<scene id="%s" camera="#%s" ambient_color="%s" fog_type="%s" background_color="%s">' 
                % (
                   scene.name,
                   scene.camera.name,
                   rgbColor(scene.world.ambient_color),
-                  fog
+                  fog,
+                  rgbColor(scene.world.horizon_color)
                   )
                )
     #<group id="graph" animation="#spin">
     tagTab = "\n\t\t"
     elTab = "\n\t\t\t"
+    
     for obj in scene.objects:
         if obj.type == "MESH":
             file.write(tagTab+'<object id="%s" mesh="#%s"' % (obj.name, obj.data.name+"Mesh"))
@@ -97,6 +95,9 @@ def writeScene(file, scene):
             if (len(material.texture_slots.items()) > 0 and material.texture_slots[0].use_map_alpha) or material.alpha != 1.0:
                     file.write(elTab+'ztransparent="TRUE"')
             file.write(tagTab+'/>')
+            if (len(obj.modifiers) > 0):
+                modifiedMeshes[obj.data.name] = obj
+                print(obj.name+" has modifiers")
             #skeleton="#Armature" action="#Stand"
             
         if obj.type == "LAMP":
@@ -190,7 +191,7 @@ def hexColor(color):
     
 #def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
 def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
-    #meshname = obj.data.name
+    meshname = mesh.name
     
     """
     if use_modifiers:
@@ -198,7 +199,10 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
     else:
         mesh = obj.data
     """
-    
+    if mesh.name in modifiedMeshes:
+        mesh = modifiedMeshes[mesh.name].create_mesh(bpy.context.scene, True, 'PREVIEW')
+        print(mesh.name+" will be modified.")
+        
     if not mesh:
         raise Exception("Error, could not get mesh data from active object")
 
@@ -222,7 +226,7 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             active_uv_layer = active_uv_layer.data
 
 
-    file.write("\t<mesh id=\"%s\">\n"  % (mesh.name+"Mesh"))
+    file.write("\t<mesh id=\"%s\">\n"  % (meshname+"Mesh"))
     
     vertices = "\t\t<positions>"
     
@@ -257,7 +261,8 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             
             #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv1)
             #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv3)
-            uvs += "\n\t\t\t%f,%f" % tuple(uv[i].uv4)
+            if len(f.vertices) == 4:
+                uvs += "\n\t\t\t%f,%f" % tuple(uv[i].uv4)
             if not lastFace:
                 uvs += ","
             
@@ -283,5 +288,5 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
         bpy.data.meshes.remove(mesh)
     """
         
-    print("writing of Mesh %r done" % mesh.name)
+    print("writing of Mesh %r done" % meshname)
 
