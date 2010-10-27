@@ -104,7 +104,7 @@ def writeScene(file, scene):
             file.write(tagTab+'<light id="%s"' % obj.name)
             file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
             file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
-            file.write(elTab+'attenuation_constant="%f" attenuation_linear="%f" attenuation_quadratic="%f"' % (0.5,0.00000001,0.00001))
+            file.write(elTab+'attenuation_constant="%f" attenuation_linear="%f" attenuation_quadratic="%f"' % (0.5,0.000001,0.0001))
             #TODO: Alternative?
             #file.write(' color_r="%f" color_g="%f" color_b="%f"' % tuple(obj.data.color))
             file.write(elTab+'color="%s"' % rgbColor(obj.data.color))
