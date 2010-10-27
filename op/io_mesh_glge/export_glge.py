@@ -71,45 +71,54 @@ def writeScene(file, scene):
                   )
                )
     #<group id="graph" animation="#spin">
+    tagTab = "\n\t\t"
+    elTab = "\n\t\t\t"
     for obj in scene.objects:
         if obj.type == "MESH":
-            file.write('\n\t\t<object id="%s" mesh="#%s"' % (obj.name, obj.data.name))
-            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
-            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
-            file.write(' scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(obj.scale))
-            file.write(' material="#%s"' % obj.material_slots.items()[0][0])
+            file.write(tagTab+'<object id="%s" mesh="#%s"' % (obj.name, obj.data.name))
+            file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
+            file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
+            file.write(elTab+'scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(obj.scale))
+            file.write(elTab+'material="#%s"' % obj.material_slots.items()[0][0])
             if len(obj.material_slots[0].material.texture_slots.items()) > 0:
                 if obj.material_slots[0].material.texture_slots[0].use_map_alpha:
-                    file.write(' ztransparent="TRUE"')
-            file.write(' />')
+                    file.write(elTab+'ztransparent="TRUE"')
+            file.write(tagTab+'/>')
             #skeleton="#Armature" action="#Stand"
             
         if obj.type == "LAMP":
-            file.write('\n\t\t<light id="%s"' % obj.name)
-            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
-            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
-            file.write(' attenuation_constant="%f" attenuation_linear="%f" attenuation_quadratic="%f"' % (0.5,0.00000001,0.00001))
+            file.write(tagTab+'<light id="%s"' % obj.name)
+            file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
+            file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
+            file.write(elTab+'attenuation_constant="%f" attenuation_linear="%f" attenuation_quadratic="%f"' % (0.5,0.00000001,0.00001))
             #TODO: Alternative?
             #file.write(' color_r="%f" color_g="%f" color_b="%f"' % tuple(obj.data.color))
-            file.write(' color="%s"' % rgbColor(obj.data.color))
+            file.write(elTab+'color="%s"' % rgbColor(obj.data.color))
             if obj.data.type == 'SUN':
                 type = 'L_DIR'
             elif obj.data.type == 'SPOT':
                 type = 'L_SPOT'
-                file.write(' buffer_width="512" buffer_height="512"')
-                file.write(' shadow_bias="%f" spot_cos_cut_off="%f" spot_exponent="%f"' % (5.0, 0.775, 50))
-                file.write(' cast_shadows="TRUE"')
+                shadowRes = 1024
+                file.write(elTab+'buffer_width="%d" buffer_height="%d"' % (shadowRes,shadowRes))
+                file.write(elTab+'shadow_bias="%f" spot_cos_cut_off="%f" spot_exponent="%f"' 
+                           % 
+                           #(5.0, 0.775, 50)
+                           (2.5, 0.80, 40)
+                )
+                file.write(elTab+'cast_shadows="TRUE"')
+              
+
             else:
                 type = 'L_POINT'
-            file.write(' type="%s"' % type)
-            file.write(' />')
+            file.write(elTab+'type="%s"' % type)
+            file.write(tagTab+' />')
         
         if obj.type == "CAMERA":
-            file.write('\n\t\t<camera id="%s"' % obj.name)
-            file.write(' loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
-            file.write(' rot_order="ROT_XZY" xtype="C_PERSPECTIVE"') #C_ORTHO
-            file.write(' rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
-            file.write(' />')
+            file.write(tagTab+'<camera id="%s"' % obj.name)
+            file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
+            file.write(elTab+'rot_order="ROT_XZY" xtype="C_PERSPECTIVE"') #C_ORTHO
+            file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
+            file.write(tagTab+'/>')
 
     file.write('\n\t</scene>')    
 
