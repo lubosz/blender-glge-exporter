@@ -189,16 +189,9 @@ def hexColor(color):
     hexColor += "%x" % int(color.b * 255)
     return hexColor
     
-#def writeMesh(file, scene, obj, use_modifiers, use_normals, use_uv_coords):
 def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
     meshname = mesh.name
-    
-    """
-    if use_modifiers:
-        mesh = obj.create_mesh(scene, True, 'PREVIEW')
-    else:
-        mesh = obj.data
-    """
+
     if mesh.name in modifiedMeshes:
         mesh = modifiedMeshes[mesh.name].create_mesh(bpy.context.scene, True, 'PREVIEW')
         print(mesh.name+" will be modified.")
@@ -283,10 +276,9 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
 
     file.write('\t</mesh>\n')
 
-    """
-    if use_modifiers:
+
+    if mesh.name in modifiedMeshes:
         bpy.data.meshes.remove(mesh)
-    """
         
     print("writing of Mesh %r done" % meshname)
 
