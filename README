@@ -1,3 +1,7 @@
 Installation
 
 Link or copy io_mesh_glge to ~/.blender/2.5X/scripts/op
+
+Running the example
+
+Link or copy the GLGE Folder to example and open index.html or put the example folder on your Webserver.
