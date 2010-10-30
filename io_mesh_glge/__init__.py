@@ -1,20 +1,23 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #
 # ##### END GPL LICENSE BLOCK #####
+
+# <pep8 compliant>
+# coding: utf-8
 
 # To support reload properly, try to access a package var, if it's there, reload everything
 if "bpy" in locals():
@@ -36,7 +39,8 @@ class ExportGLGE(bpy.types.Operator, ExportHelper):
 
     use_modifiers = BoolProperty(name="Apply Modifiers", description="Apply Modifiers to the exported mesh", default=True)
     use_normals = BoolProperty(name="Normals", description="Export Normals for smooth and hard shaded faces", default=True)
-    use_uv_coords = BoolProperty(name="UVs", description="Exort the active UV layer", default=True)
+    use_uv_coords = BoolProperty(name="UVs", description="Export the active UV layer", default=True)
+    compress_meshes = BoolProperty(name="Compress Meshes", description="Shorten the XML output of the mesh file", default=True)
 
     @classmethod
     def poll(cls, context):
@@ -56,7 +60,8 @@ class ExportGLGE(bpy.types.Operator, ExportHelper):
         row.prop(self, "use_normals")
         row = layout.row()
         row.prop(self, "use_uv_coords")
-
+        row = layout.row()
+        row.prop(self, "compress_meshes")
 
 def menu_func(self, context):
     self.layout.operator(ExportGLGE.bl_idname, text="GLGE (.xml)")

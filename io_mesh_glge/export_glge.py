@@ -1,18 +1,18 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 #
 # ##### END GPL LICENSE BLOCK #####
 
@@ -30,7 +30,7 @@ import bpy, os
 
 modifiedMeshes = {}
 
-def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True):
+def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, compress_meshes=True):
     
     scene = context.scene
     obj = context.object
@@ -47,21 +47,21 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     dest_dir = os.path.dirname(filepath)
     meshpath = dest_dir + "/" + meshFileName
     file = beginGLGEFile(meshpath)
-    writeMeshes(file)
+    writeMeshes(file, compress_meshes)
     endGLGEFile(file)
     
     return {'FINISHED'}
 
 def beginGLGEFile(filepath):
     file = open(filepath, 'w')
-    file.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-    file.write('<!DOCTYPE glge SYSTEM "glge.dtd">\n')
-    file.write('<!-- Created by Blender %s - www.blender.org, source file: %r -->\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
-    file.write('<glge>\n')
+    file.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
+    file.write('\n<!DOCTYPE glge SYSTEM "glge.dtd">')
+    file.write('\n<!-- Created by Blender %s - www.blender.org, source file: %r -->' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
+    file.write('\n<glge>')
     return file
 
 def endGLGEFile(file):
-    file.write('\n</glge>\n')
+    file.write('\n</glge>')
     file.close()
     print("writing %r done" % file.name)
 
@@ -174,9 +174,9 @@ def writeMaterials(file):
                 #mapinput MAP_ENV, MAP_OBJ, UV2
         file.write('\n\t</material>')
     
-def writeMeshes(file):
+def writeMeshes(file, compress_meshes):
     for mesh in bpy.data.meshes:
-        writeMesh(file, mesh)
+        writeMesh(file, mesh, compress_meshes)
 
 def rgbColor(color):
     return "rgb(%d,%d,%d)" % (color.r * 255, color.g * 255, color.b * 255)
@@ -189,7 +189,7 @@ def hexColor(color):
     hexColor += "%x" % int(color.b * 255)
     return hexColor
     
-def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
+def writeMesh(file, mesh, use_normals=True, use_uv_coords=True, compress_meshes=True):
     meshname = mesh.name
 
     if mesh.name in modifiedMeshes:
@@ -217,45 +217,59 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             faceUV = None
         else:
             active_uv_layer = active_uv_layer.data
-
-
-    file.write("\t<mesh id=\"%s\">\n"  % (meshname+"Mesh"))
+            
+    tab1 = "\n\t"
     
-    vertices = "\t\t<positions>"
+    if compress_meshes:
+        tab2 = ""
+        tab3 = ""
+        precision = 3
+    else:
+        tab2 = "\n\t\t"
+        tab3 = "\n\t\t\t"
+        precision = 6
+        
+    
+    fTriple = '%%.%df,%%.%df,%%.%df' % (precision,precision,precision)
+    fTuple = '%%.%df,%%.%df' % (precision,precision)
+
+    file.write(tab1 + "<mesh id=\"%s\">"  % (meshname+"Mesh"))
+    
+    vertices = tab2 + "<positions>"
     
     if use_normals:
-        normals = "\t\t<normals>"
+        normals = tab2 + "<normals>"
         
     if use_uv_coords:
         uv = mesh.uv_textures.active.data
-        uvs = "\t\t<uv1>"
+        uvs = tab2 + "<uv1>"
         
-    indices = "\t\t<faces>\n\t\t\t"
+    indices = tab2 + "<faces>" + tab3
     index = 0
     
     for i,f in enumerate(mesh.faces):
         lastFace = (i == len(mesh.faces)-1)
         for j,vertex in enumerate(f.vertices):
             lastVert = (j == len(f.vertices)-1 and lastFace)
-            vertices+= '\n\t\t\t%f,%f,%f' % tuple(mesh.vertices[vertex].co)
+            vertices+= tab3 + fTriple % tuple(mesh.vertices[vertex].co)
             if not lastVert:
                 vertices+="," 
             if use_normals:
                 if f.use_smooth:
-                    normals += '\n\t\t\t%f,%f,%f' % tuple(mesh.vertices[vertex].normal) # smooth?
+                    normals += tab3 + fTriple % tuple(mesh.vertices[vertex].normal) # smooth?
                 else:
-                    normals += '\n\t\t\t%f,%f,%f' % tuple(f.normal) # no
+                    normals += tab3 + fTriple % tuple(f.normal) # no
                 if not lastVert:
                     normals+="," 
         if use_uv_coords:
-            uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv1)
-            uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv2)
-            uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv3)
+            uvs += tab3 + fTuple % tuple(uv[i].uv1) + ','
+            uvs += tab3 + fTuple % tuple(uv[i].uv2) + ','
+            uvs += tab3 + fTuple % tuple(uv[i].uv3) + ','
             
-            #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv1)
-            #uvs += "\n\t\t\t%f,%f," % tuple(uv[i].uv3)
+            #uvs += tab3 + fTuple + ',' % tuple(uv[i].uv1)
+            #uvs += tab3 + fTuple + ',' % tuple(uv[i].uv3)
             if len(f.vertices) == 4:
-                uvs += "\n\t\t\t%f,%f" % tuple(uv[i].uv4)
+                uvs += tab3 + fTuple % tuple(uv[i].uv4)
             if not lastFace:
                 uvs += ","
             
@@ -267,14 +281,14 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True):
             indices += ","
         index+=len(f.vertices)
 
-    file.write(vertices + "\n\t\t</positions>\n")
+    file.write(vertices + tab2 + "</positions>")
     if use_normals:
-        file.write(normals + "\n\t\t</normals>\n")
+        file.write(normals + tab2 + "</normals>")
     if use_uv_coords:
-        file.write(uvs + "\n\t\t</uv1>\n")
-    file.write(indices + "\n\t\t</faces>\n")
+        file.write(uvs + tab2 + "</uv1>")
+    file.write(indices + tab2 + "</faces>")
 
-    file.write('\t</mesh>\n')
+    file.write(tab1 + '</mesh>')
 
 
     if mesh.name in modifiedMeshes:
