@@ -22,8 +22,7 @@
 
 """
 This script exports GLGE XML files from Blender. It supports normals
-and texture coordinates per face or per vertex.
-Only one mesh can be exported at a time.
+and texture coordinates per face.
 """
 
 import bpy, os
