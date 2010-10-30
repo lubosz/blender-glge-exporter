@@ -32,20 +32,26 @@ modifiedMeshes = {}
 def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, compress_meshes=True):
     
     scene = context.scene
-    obj = context.object
     meshFileName = "meshes.xml"
+    materialFileName = "materials.xml"
+    destDir = os.path.dirname(filepath)
+    meshPath = destDir + "/" + meshFileName
+    materialPath = destDir + "/" + materialFileName
     
     #Write scene file
     file = beginGLGEFile(filepath)
-    file.write('\t<import url="%s" />' % meshFileName)
-    writeMaterials(file)
+    file.write('\n\t<import url="%s" />' % meshFileName)
+    file.write('\n\t<import url="%s" />' % materialFileName)
     writeScene(file, scene)
     endGLGEFile(file)
     
+    #write material file
+    file = beginGLGEFile(materialPath)
+    writeMaterials(file)
+    endGLGEFile(file)
+    
     #write mesh file
-    dest_dir = os.path.dirname(filepath)
-    meshpath = dest_dir + "/" + meshFileName
-    file = beginGLGEFile(meshpath)
+    file = beginGLGEFile(meshPath)
     writeMeshes(file, compress_meshes)
     endGLGEFile(file)
     
