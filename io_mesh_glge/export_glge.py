@@ -52,7 +52,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     
     #write mesh file
     file = beginGLGEFile(meshPath)
-    writeMeshes(file, compress_meshes)
+    writeMeshes(file, use_modifiers, use_normals, use_uv_coords, compress_meshes)
     endGLGEFile(file)
     
     return {'FINISHED'}
@@ -179,9 +179,9 @@ def writeMaterials(file):
                 #mapinput MAP_ENV, MAP_OBJ, UV2
         file.write('\n\t</material>')
     
-def writeMeshes(file, compress_meshes):
+def writeMeshes(file, use_modifiers, use_normals, use_uv_coords,compress_meshes):
     for mesh in bpy.data.meshes:
-        writeMesh(file, mesh, compress_meshes)
+        writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords,compress_meshes)
 
 def rgbColor(color):
     return "rgb(%d,%d,%d)" % (color.r * 255, color.g * 255, color.b * 255)
@@ -194,10 +194,10 @@ def hexColor(color):
     hexColor += "%x" % int(color.b * 255)
     return hexColor
     
-def writeMesh(file, mesh, use_normals=True, use_uv_coords=True, compress_meshes=True):
+def writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords, compress_meshes):
     meshname = mesh.name
 
-    if mesh.name in modifiedMeshes:
+    if mesh.name in modifiedMeshes and use_modifiers:
         mesh = modifiedMeshes[mesh.name].create_mesh(bpy.context.scene, True, 'PREVIEW')
         print(mesh.name+" will be modified.")
         
@@ -296,7 +296,7 @@ def writeMesh(file, mesh, use_normals=True, use_uv_coords=True, compress_meshes=
     file.write(tab1 + '</mesh>')
 
 
-    if mesh.name in modifiedMeshes:
+    if mesh.name in modifiedMeshes and use_modifiers:
         bpy.data.meshes.remove(mesh)
         
     print("writing of Mesh %r done" % meshname)
