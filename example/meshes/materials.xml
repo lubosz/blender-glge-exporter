@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glge SYSTEM "glge.dtd">
+<!-- Created by Blender 2.54 (sub 0) - www.blender.org, source file: 'nature.blend' -->
+<glge>
+	<material id="bark" color="rgb(10,9,7)" specular="0.000000" shininess="11.000000" emit="0.000000" >
+		<texture id="barkTex" src="../textures/bark.jpg" />
+		<material_layer texture="#barkTex" mapinput="UV1" mapto="M_COLOR" />
+		<texture id="barknormalTex" src="../textures/bark-normal.png" />
+		<material_layer texture="#barknormalTex" mapinput="UV1" mapto="M_NOR" />
+	</material>
+	<material id="Boden" color="rgb(204,204,204)" specular="0.314050" shininess="50.000000" emit="0.000000" >
+		<texture id="GrassTex" src="../textures/grass-texture.jpg" />
+		<material_layer texture="#GrassTex" mapinput="UV1" mapto="M_COLOR" />
+		<texture id="GrassNormalTex" src="../textures/grass-texture-normal.png" />
+		<material_layer texture="#GrassNormalTex" mapinput="UV1" mapto="M_NOR" />
+	</material>
+	<material id="CubeMat" color="rgb(41,50,204)" specular="0.500000" shininess="50.000000" emit="0.000000" alpha="0.710744" >
+	</material>
+	<material id="Dracena" color="rgb(204,204,204)" specular="0.500000" shininess="50.000000" emit="0.010000" >
+		<texture id="Texture.001Tex" src="../textures/greenhouse/Dracena.png" />
+		<material_layer texture="#Texture.001Tex" mapinput="UV1" mapto="M_COLOR" />
+		<material_layer texture="#Texture.001Tex" mapinput="UV1" mapto="M_ALPHA" />
+	</material>
+	<material id="Dracena.001" color="rgb(204,204,204)" specular="0.500000" shininess="50.000000" emit="0.010000" >
+		<texture id="Texture.002Tex" src="../textures/greenhouse/Bamboo-rgba.png" />
+		<material_layer texture="#Texture.002Tex" mapinput="UV1" mapto="M_COLOR" />
+		<material_layer texture="#Texture.002Tex" mapinput="UV1" mapto="M_ALPHA" />
+	</material>
+	<material id="GrassBillboard" color="rgb(204,204,204)" specular="0.500000" shininess="50.000000" emit="0.000000" >
+		<texture id="TextureTex" src="../textures/grassstrand.png" />
+		<material_layer texture="#TextureTex" mapinput="UV1" mapto="M_COLOR" />
+		<material_layer texture="#TextureTex" mapinput="UV1" mapto="M_ALPHA" />
+	</material>
+	<material id="leaves" color="rgb(0,255,0)" specular="0.000000" shininess="50.000000" emit="0.000000" >
+		<texture id="leaveTex" src="../textures/leafs/Oak_Leaf.png" />
+		<material_layer texture="#leaveTex" mapinput="UV1" mapto="M_COLOR" />
+		<material_layer texture="#leaveTex" mapinput="UV1" mapto="M_ALPHA" />
+	</material>
+</glge>

@@ -1,0 +1,8 @@
+<!ATTLIST mesh id ID #IMPLIED> 
+<!ATTLIST animation_vector id ID #IMPLIED> 
+<!ATTLIST object id ID #IMPLIED> 
+<!ATTLIST light id ID #IMPLIED> 
+<!ATTLIST texture id ID #IMPLIED>
+<!ATTLIST material id ID #IMPLIED> 
+<!ATTLIST skeletal_action id ID #IMPLIED> 
+<!ATTLIST skeleton id ID #IMPLIED>

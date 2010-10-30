@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<title>WebGL Campus</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="scripts/nature.css" type="text/css"> 
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script type="text/javascript" src="GLGE/glge_math.js"></script>
+		<script type="text/javascript" src="GLGE/glge.js"></script>
+		<script type="text/javascript" src="GLGE/glge_input.js"></script>
+
+	</head>
+	<body>
+				<canvas id="canvas"></canvas>
+				<img id="logo" src="images/glgelogo.png" alt="GLGE Logo" />
+				<div id="framerate">
+					<div id="debug" style="padding: 5px"></div>
+				</div>
+				<div id="notification">
+					<h2>Nature Demo</h2>
+					<p style="font-size: 14px;">
+						shadow_bias<br/><span id="shadow_bias">0</span><br/>
+						<input type="range" min="0.0" max="10.0" value="0.1" step="0.1" onchange="setShadowBias(this.value)" />
+						<br/>
+						spot_cos_cut_off<br/><span id="spot_cos_cut_off">0</span><br/>
+						<input type="range" min="0.0" max="1" value="0.8" step="0.01" onchange="setSpotCosCutOff(this.value)" />
+						<br/>
+						spot_exponent<br/><span id="spot_exponent">0</span><br/>
+						<input type="range" min="0.0" max="100" value="35" step="0.1" onchange="setSpotExponent(this.value)" />
+						<br/>
+					</p>
+				</div>
+
+		<script type="text/javascript" src="scripts/nature.js"></script>
+
+	</body>
+</html>
