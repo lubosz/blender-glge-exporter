@@ -1,6 +1,8 @@
 Blender GLGE Exporter
 =====================
 
+A GLGE WebGL exporter for Blender 2.5
+
 Installation
 ------------
 
@@ -12,7 +14,7 @@ Features
 * Blender 2.5 support
 * Mesh export with UV coords and normals
 * Scene export with objects, cameras and lights
-* Automatic modifier apply
+* Modifier support
 * Material color, texture, shading values and transparency
 * 3 light types with colors and shadow maps in spot lights
 * Normal and alpha maps
@@ -28,7 +30,7 @@ Link or copy the `GLGE` folder to `example`. You can clone [supereggbert's GLGE 
 Open `index.html` or put the `example` folder on your web server.
 Of course you need a browser with WebGL support. You can check out a current Chromium or Firefox 4.
 
-Exporting Hints
+Hints
 ---------------
 
 Textures have to be power of two. E.g. 16x16, 512x512, 1024x1024.
