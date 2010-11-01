@@ -92,13 +92,13 @@ def writeScene(file, scene):
     for obj in scene.objects:
         if obj.type == "MESH":
             file.write(tagTab+'<object id="%s" mesh="#%s"' % (obj.name, obj.data.name+"Mesh"))
-
+            file.write(elTab+'rot_order="ROT_ZYX"')
             file.write(elTab+'scale_x="%f" scale_y="%f" scale_z="%f"' % tuple(obj.scale))
             if len(obj.material_slots.items()) > 0:
-            	file.write(elTab+'material="#%s"' % obj.material_slots.items()[0][0])
-            	material = obj.material_slots[0].material
-            	if (len(material.texture_slots.items()) > 0 and material.texture_slots[0].use_map_alpha) or material.alpha != 1.0:
-            	        file.write(elTab+'ztransparent="TRUE"')
+                file.write(elTab+'material="#%s"' % obj.material_slots.items()[0][0])
+                material = obj.material_slots[0].material
+                if (len(material.texture_slots.items()) > 0 and material.texture_slots[0].use_map_alpha) or material.alpha != 1.0:
+                    file.write(elTab+'ztransparent="TRUE"')
             if (len(obj.modifiers) > 0):
                 modifiedMeshes[obj.data.name] = obj
                 print(obj.name+" has modifiers")
@@ -107,6 +107,7 @@ def writeScene(file, scene):
         if obj.type == "LAMP":
             file.write(tagTab+'<light id="%s"' % obj.name)
             file.write(elTab+'attenuation_constant="%f" attenuation_linear="%f" attenuation_quadratic="%f"' % (0.5,0.000001,0.0001))
+            file.write(elTab+'rot_order="ROT_ZYX"')
             #TODO: Alternative?
             #file.write(' color_r="%f" color_g="%f" color_b="%f"' % tuple(obj.data.color))
             file.write(elTab+'color="%s"' % rgbColor(obj.data.color))
@@ -130,11 +131,13 @@ def writeScene(file, scene):
         
         if obj.type == "CAMERA":
             file.write(tagTab+'<camera id="%s"' % obj.name)
-            file.write(elTab+'rot_order="ROT_XYZ" xtype="C_PERSPECTIVE"') #C_ORTHO
+            file.write(elTab+'xtype="%s"' % 'C_PERSPECTIVE') #C_ORTHO
+            file.write(elTab+'rot_order="ROT_XZY"')
             
         file.write(elTab+'loc_x="%f" loc_y="%f" loc_z="%f"' % tuple(obj.location))
         #Wrong rotation?
         file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % tuple(obj.rotation_euler))
+        
         #file.write(elTab+'rot_x="%f" rot_y="%f" rot_z="%f"' % (obj.rotation_euler.z, obj.rotation_euler.x, obj.rotation_euler.y))
         file.write(tagTab+'/>')
 
