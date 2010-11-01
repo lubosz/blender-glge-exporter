@@ -13,9 +13,9 @@ Features
 * Mesh export with UV coords and normals
 * Scene export with objects, cameras and lights
 * Automatic modifier apply
-* Material colors, shading values and transparency
-* 3 light types with colors and shadow maps in spotlights
-* Normal maps and alpha maps
+* Material color, texture, shading values and transparency
+* 3 light types with colors and shadow maps in spot lights
+* Normal and alpha maps
 * Scene fog, ambient and background color
 * Separates meshes, materials and scene in 3 files
 * Nicely intended XML markup
