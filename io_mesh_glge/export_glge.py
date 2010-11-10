@@ -76,15 +76,17 @@ def writeScene(file, scene):
     else:
         fog = 'FOG_NONE'
     
-    file.write('\n\t<scene id="%s" camera="#%s" ambient_color="%s" fog_type="%s" background_color="%s">' 
+    file.write('\n\t<scene id="%s" ambient_color="%s" fog_type="%s" background_color="%s"' 
                % (
                   scene.name,
-                  scene.camera.name,
                   rgbColor(scene.world.ambient_color),
                   fog,
                   rgbColor(scene.world.horizon_color)
                   )
                )
+    if scene.camera:
+        file.write(' camera="#%s"' % scene.camera.name)
+    file.write('>')
     #<group id="graph" animation="#spin">
     tagTab = "\n\t\t"
     elTab = "\n\t\t\t"
@@ -271,12 +273,12 @@ def writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords, compress_me
         if use_uv_coords:
             uvs += tab3 + fTuple % tuple(uv[i].uv1) + ','
             uvs += tab3 + fTuple % tuple(uv[i].uv2) + ','
-            uvs += tab3 + fTuple % tuple(uv[i].uv3) + ','
+            uvs += tab3 + fTuple % tuple(uv[i].uv3) 
             
             #uvs += tab3 + fTuple + ',' % tuple(uv[i].uv1)
             #uvs += tab3 + fTuple + ',' % tuple(uv[i].uv3)
             if len(f.vertices) == 4:
-                uvs += tab3 + fTuple % tuple(uv[i].uv4)
+                uvs += ',' + tab3 + fTuple % tuple(uv[i].uv4)
             if not lastFace:
                 uvs += ","
             
