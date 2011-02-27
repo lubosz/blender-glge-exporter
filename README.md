@@ -6,7 +6,7 @@ A GLGE WebGL exporter for Blender 2.5
 Installation
 ------------
 
-Link or copy `io_mesh_glge` to `~/.blender/2.5X/scripts/op`
+Link or copy `io_mesh_glge` to `~/.blender/2.5X/scripts/addons`
 
 Features
 --------
