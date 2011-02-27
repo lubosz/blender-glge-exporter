@@ -36,7 +36,7 @@ bl_info = {
         "materials and objects.",
     "warning": "",
     "wiki_url": "",
-    "tracker_url": "",
+    "tracker_url": "https://github.com/lubosz/blender-glge-exporter/issues",
     "category": "Import-Export"}
 
 
