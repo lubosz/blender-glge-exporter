@@ -25,7 +25,7 @@ if "bpy" in locals():
     reload(sys.modules.get("io_mesh_glge.export_glge", sys))
 
 
-bl_info = {
+bl_addon_info = {
     "name": "Blender to GLGE",
     "author": "Lubosz Sarnecki (lubosz)",
     "version": (0, 1),
@@ -83,12 +83,10 @@ def menu_func(self, context):
 
 
 def register():
-    bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_file_export.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
     bpy.types.INFO_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
