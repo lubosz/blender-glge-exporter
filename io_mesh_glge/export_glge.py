@@ -256,8 +256,8 @@ def writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords, compress_me
     indices = tab2 + "<faces>" + tab3
     index = 0
     
-    for i,f in enumerate(mesh.faces):
-        lastFace = (i == len(mesh.faces)-1)
+    for i,f in enumerate(mesh.polygons):
+        lastFace = (i == len(mesh.polygons)-1)
         for j,vertex in enumerate(f.vertices):
             lastVert = (j == len(f.vertices)-1 and lastFace)
             vertices+= tab3 + fTriple % tuple(mesh.vertices[vertex].co)

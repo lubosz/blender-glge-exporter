@@ -24,26 +24,24 @@ if "bpy" in locals():
     import sys
     reload(sys.modules.get("io_mesh_glge.export_glge", sys))
 
-
 bl_info = {
     "name": "Blender to GLGE",
     "author": "Lubosz Sarnecki (lubosz)",
-    "version": (0, 1),
-    "blender": (2, 5, 6),
+    "version": (0, 2),
+    "blender": (2, 6, 3),
     "api": 34647,
     "location": "File > Export > GLGE",
     "description": "Export a GLGE Scene as XML with meshes, lights, camera, "\
         "materials and objects.",
     "warning": "",
-    "wiki_url": "",
+    "wiki_url": "https://github.com/lubosz/blender-glge-exporter",
     "tracker_url": "https://github.com/lubosz/blender-glge-exporter/issues",
     "category": "Import-Export"}
 
 
 import bpy
 from bpy.props import *
-from io_utils import ExportHelper
-
+from bpy_extras.io_utils import ExportHelper
 
 class ExportGLGE(bpy.types.Operator, ExportHelper):
     '''Export a GLGE Scene as XML with meshes, lights, camera, materials and objects.'''
