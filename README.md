@@ -1,12 +1,15 @@
 Blender GLGE Exporter
 =====================
 
-A GLGE WebGL exporter for Blender 2.5
+A GLGE WebGL exporter for Blender 2.6
 
 Installation
 ------------
 
-Link or copy `io_mesh_glge` to `~/.blender/2.5X/scripts/addons`
+Link or copy `io_mesh_glge` to `~/.blender/2.63/scripts/addons`
+
+* mkdir ~/.blender/2.63/scripts/addons -p
+* ln -s $PWD/io_mesh_glge/ ~/.blender/2.63/scripts/addons
 
 Features
 --------
@@ -27,8 +30,8 @@ Running the example
 -------------------
 
 Link or copy the `GLGE` folder to `example`. You can clone [supereggbert's GLGE git repository](http://github.com/supereggbert/GLGE).
-Open `index.html` or put the `example` folder on your web server.
-Of course you need a browser with WebGL support. You can check out a current Chromium or Firefox 4.
+Put the `example` folder on your web server. GLGE does not work locally (only http://, no file://).
+Of course you need a browser with WebGL support. You can check out a current Chromium or Firefox.
 
 Hints
 ---------------
