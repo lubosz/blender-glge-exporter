@@ -202,7 +202,7 @@ def writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords, compress_me
     meshname = mesh.name
 
     if mesh.name in modifiedMeshes and use_modifiers:
-        mesh = modifiedMeshes[mesh.name].create_mesh(bpy.context.scene, True, 'PREVIEW')
+        mesh = modifiedMeshes[mesh.name].to_mesh(bpy.context.scene, True, 'PREVIEW')
         print(mesh.name+" will be modified.")
         
     if not mesh:
@@ -255,7 +255,7 @@ def writeMesh(file, mesh, use_modifiers, use_normals, use_uv_coords, compress_me
         
     indices = tab2 + "<faces>" + tab3
     index = 0
-    
+
     for i,f in enumerate(mesh.polygons):
         lastFace = (i == len(mesh.polygons)-1)
         for j,vertex in enumerate(f.vertices):
